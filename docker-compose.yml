@@ -7,9 +7,9 @@ services:
       dockerfile: Dockerfile
     container_name: lethe-cfd
     ports:
-      - "8888:8888"
+      - "8888:8888"  # 如果你使用 Jupyter 或其他服务
     volumes:
-      - /home/youruser/data:/lethe/data
+      - /home/youruser/data:/lethe/data  # 修改为实际路径
     deploy:
       resources:
         reservations:
@@ -21,3 +21,4 @@ services:
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
     restart: unless-stopped
+
