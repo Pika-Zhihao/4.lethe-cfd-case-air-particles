@@ -3,7 +3,7 @@ version: '3.8'
 services:
   lethe-cfd:
     build:
-      context: .
+      context: https://github.com/Pika-Zhihao/lethe-cfd-stack.git#main
       dockerfile: Dockerfile
     container_name: lethe-cfd
     ports:
