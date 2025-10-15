@@ -1,5 +1,3 @@
-lethe-cfd-case-air-particles/
-
 ├── README.md                          # Project description
 ├── Dockerfile                         # Build the Lethe CFD image
 ├── docker-compose.yml                 # Docker deployment configuration (for use with Portainer)
