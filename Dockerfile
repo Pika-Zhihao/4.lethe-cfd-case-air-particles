@@ -1,7 +1,6 @@
 FROM nvidia/cuda:12.6.3-cudnn-devel-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
-
 # 安装依赖
 RUN apt update && apt install -y \
     build-essential cmake git wget curl \
@@ -32,4 +31,3 @@ RUN git clone https://github.com/chaos-polymtl/lethe.git /lethe && \
     make -j$(nproc)
 
 WORKDIR /lethe/build
-
