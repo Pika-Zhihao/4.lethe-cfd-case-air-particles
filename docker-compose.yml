@@ -3,7 +3,7 @@ version: '3.8'
 services:
   lethe-cfd:
     build:
-      context: https://github.com/Pika-Zhihao/lethe-cfd-stack.git#main
+      context: https://github.com/Pika-Zhihao/4.lethe-cfd-case-air-particles.git#main
       dockerfile: Dockerfile
     container_name: lethe-cfd
     ports:
@@ -20,5 +20,7 @@ services:
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - LETHE_USE_GPU=1
+    working_dir: /lethe/build
+    command: ["./lethe_solver", "/lethe/data/simulation.prm"]
     restart: unless-stopped
-
