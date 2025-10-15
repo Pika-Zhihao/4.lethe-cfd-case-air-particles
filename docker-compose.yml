@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: lethe-cfd
     ports:
-      - "8888:8888"
+      - "32005:8888"
     volumes:
       - /home/youruser/data:/lethe/data
     runtime: nvidia
