@@ -1,6 +1,6 @@
 # Lethe CFD Simulation Parameters
 
-set Mesh file name = mesh.vtk
+set Mesh file name = /lethe/data/rbf_sdf_field.vtk
 
 subsection Physical properties
   set Fluid density = 1.225
