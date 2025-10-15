@@ -1,0 +1,52 @@
+# Lethe CFD Simulation Parameters
+
+set Mesh file name = mesh.vtk
+
+subsection Physical properties
+  set Fluid density = 1.225
+  set Fluid viscosity = 1.81e-5
+end
+
+subsection Boundary conditions
+  set Boundary condition type = pressure_inlet pressure_outlet no_slip_wall
+  set Inlet pressure = 101325
+  set Outlet pressure = 101225
+end
+
+subsection Porous media
+  set Porosity field = RBF_SDF
+  set Porosity threshold = 0.1
+end
+
+subsection Simulation control
+  set Time step = 0.0001
+  set End time = 1.0
+  set Output frequency = 1
+end
+
+subsection Output
+  set Output directory = output/
+  set Output format = vtu
+  set Output fields = velocity pressure porosity particle_trajectory
+end
+subsection Solver settings
+  set Linear solver = BiCGStab
+  set Preconditioner = AMG
+end
+
+subsection Particle tracking
+  set Particle type = inert
+  set Particle density = 292.8
+  set Particle injection surface = inlet
+  set Particle output = true
+  set Particle output frequency = 1
+end
+
+subsection Gravity
+  set Gravity vector = 0 0 -9.81
+end
+
+subsection GPU acceleration
+  set Enable GPU = true
+  set GPU backend = CUDA
+end
