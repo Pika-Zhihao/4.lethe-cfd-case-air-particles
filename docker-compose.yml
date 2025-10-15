@@ -3,20 +3,14 @@ version: '3.8'
 services:
   lethe-cfd:
     build:
-      context: https://github.com/Pika-Zhihao/4.lethe-cfd-case-air-particles.git#main
+      context: https://github.com/Pika-Zhihao/lethe-cfd-stack.git#main
       dockerfile: Dockerfile
     container_name: lethe-cfd
     ports:
-      - "8888:8888"  # 如果你使用 Jupyter 或其他服务
+      - "8888:8888"
     volumes:
-      - /home/youruser/data:/lethe/data  # 修改为实际路径
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+      - /home/youruser/data:/lethe/data
+    runtime: nvidia
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
