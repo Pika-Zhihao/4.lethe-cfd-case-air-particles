@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   lethe-cfd:
-    image: zhihao/lethe-cfd:latest  # 使用你上传的镜像
+    image: pikazhihao/lethe-cfd:latest  # 使用你上传的镜像
     container_name: lethe-cfd
     runtime: nvidia
     environment:
