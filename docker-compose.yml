@@ -2,15 +2,21 @@ version: '3.8'
 
 services:
   lethe-cfd:
-    image: pikazhihao/lethe-cfd:latest  # 使用你上传的镜像
-    container_name: lethe-cfd
-    runtime: nvidia
+    image: pikazhihao/lethe-cfd:latest
+    container_name: lethe_solver
+    restart: unless-stopped
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    working_dir: /lethe/build
+    command: ["./lethe_solver", "/app/config/simulation.prm"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
-      - LETHE_USE_GPU=1
-    volumes:
-      - /home/asrc_user/data:/lethe/data  # 根据ASRC服务器实际路径修改
-    working_dir: /lethe/build
-    command: ["./lethe_solver", "/lethe/data/simulation.prm"]
-    restart: unless-stopped
