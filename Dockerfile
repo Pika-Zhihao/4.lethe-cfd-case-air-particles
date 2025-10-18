@@ -49,4 +49,3 @@ CMD ["/lethe_solver", "/app/config/simulation.prm"]
 
 # 挂载配置与数据目录
 VOLUME ["/app/config", "/app/data"]
-``
