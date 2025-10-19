@@ -27,10 +27,13 @@ RUN bash -c "source /opt/spack/share/spack/setup-env.sh && \
 RUN git clone https://github.com/chaos-polymtl/lethe.git /lethe
 
 # 构建 Lethe CFD
+# 构建 Lethe CFD
 WORKDIR /lethe
 RUN bash -c "\
     source /opt/spack/share/spack/setup-env.sh && \
     spack load dealii && \
+    export CXX=/usr/bin/g++ && \
+    export CC=/usr/bin/gcc && \
     mkdir -p build && cd build && \
     cmake -DDEAL_II_DIR=\$(spack location -i dealii) \
           -DLETHE_BUILD_CFD=ON \
