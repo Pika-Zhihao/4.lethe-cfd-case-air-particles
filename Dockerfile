@@ -1,5 +1,6 @@
 # 第一阶段：构建 deal.II 和 Lethe CFD
 FROM nvidia/cuda:12.6.3-cudnn-devel-ubuntu22.04 AS builder
+
 # 安装依赖
 RUN apt update && apt install -y \
     build-essential cmake git wget curl \
@@ -18,7 +19,10 @@ RUN git clone https://github.com/spack/spack.git /opt/spack
 ENV SPACK_ROOT=/opt/spack
 ENV PATH=$SPACK_ROOT/bin:$PATH
 
-# 安装 deal.II（使用 Spack 安装，但不加载 wrapper）
+# 禁用 Spack 编译器包装器
+ENV SPACK_NO_COMPILER_WRAPPERS=1
+
+# 安装 deal.II（使用 Spack 安装，但不使用 wrapper）
 RUN bash -c "source /opt/spack/share/spack/setup-env.sh && \
              spack install dealii +mpi +petsc +trilinos +hdf5 +p4est +vtk"
 
@@ -29,21 +33,20 @@ RUN git clone https://github.com/chaos-polymtl/lethe.git /lethe
 WORKDIR /lethe
 RUN bash -c "\
     source /opt/spack/share/spack/setup-env.sh && \
-    DEAL_II_DIR=\$(spack location -i dealii) && \
+    DEAL_II_DIR=$(spack location -i dealii) && \
     export CXX=/usr/bin/g++ && \
     export CC=/usr/bin/gcc && \
     mkdir -p build && cd build && \
-    cmake -DDEAL_II_DIR=\$DEAL_II_DIR \
+    cmake -DDEAL_II_DIR=$DEAL_II_DIR \
           -DLETHE_BUILD_CFD=ON \
           -DLETHE_BUILD_PINN=OFF .. && \
-    make -j\$(nproc)"
+    make -j$(nproc)"
 
 # 第二阶段：精简镜像，仅保留可执行文件
 FROM nvidia/cuda:12.6.3-cudnn-devel-ubuntu22.04
 
 # 拷贝可执行文件
 COPY --from=builder /lethe/build/lethe_solver /lethe_solver
-
 # 设置工作目录和默认命令
 WORKDIR /app
 CMD ["/lethe_solver", "/app/config/simulation.prm"]
