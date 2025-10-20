@@ -33,9 +33,10 @@ RUN git clone https://github.com/chaos-polymtl/lethe.git /lethe
 WORKDIR /lethe
 RUN bash -c "\
     source /opt/spack/share/spack/setup-env.sh && \
-    DEAL_II_DIR=$(spack location -i dealii) && \
+    export SPACK_NO_COMPILER_WRAPPERS=1 && \
     export CXX=/usr/bin/g++ && \
     export CC=/usr/bin/gcc && \
+    DEAL_II_DIR=$(spack location -i dealii)/share/deal.II/cmake && \
     mkdir -p build && cd build && \
     cmake -DDEAL_II_DIR=$DEAL_II_DIR \
           -DLETHE_BUILD_CFD=ON \
