@@ -1,10 +1,8 @@
 # 第一阶段：构建 Lethe CFD
 FROM nvidia/cuda:12.6.3-cudnn-devel-ubuntu22.04 AS builder
-
 # 设置非交互模式和时区为香港
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Asia/Hong_Kong
-
 # 安装基础依赖
 RUN apt update && apt install -y \
     tzdata \
@@ -35,8 +33,12 @@ ENV PATH=/opt/conda/bin:$PATH
 # 安装 PETSc（源码优先，失败则 Conda 安装 petsc4py）
 RUN git clone https://gitlab.com/petsc/petsc.git /petsc && \
     cd /petsc && \
-    ./configure && make all && make install \
-    || (echo "PETSc 源码安装失败，尝试使用 Conda 安装 petsc4py" && conda install -y petsc4py)
+    ./configure --prefix=/opt/petsc && \
+    make all && make install \
+    || (echo "PETSc 源码安装失败，尝试使用 Conda 安装 petsc4py" && \
+        conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main && \
+        conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r && \
+        conda install -y petsc4py)
 
 # 安装 Trilinos（源码优先，失败则跳过）
 RUN git clone https://github.com/trilinos/Trilinos.git /trilinos && \
