@@ -24,26 +24,31 @@ RUN apt update && apt install -y \
 # 设置时区（避免 tzdata 交互）
 RUN ln -fs /usr/share/zoneinfo/$TZ /etc/localtime && \
     dpkg-reconfigure -f noninteractive tzdata
-# 安装 Miniconda（用于方法三）
+
+# 安装 Miniconda（用于备用方案）
 RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh && \
     bash miniconda.sh -b -p /opt/conda && \
     rm miniconda.sh
 
 ENV PATH=/opt/conda/bin:$PATH
-# 安装 PETSc（方法二：源码安装）
+
+# 安装 PETSc（源码优先，失败则 Conda 安装 petsc4py）
 RUN git clone https://gitlab.com/petsc/petsc.git /petsc && \
     cd /petsc && \
-    ./configure && make all && make install || echo "PETSc 源码安装失败，建议使用 Conda 安装 petsc4py"
+    ./configure && make all && make install \
+    || (echo "PETSc 源码安装失败，尝试使用 Conda 安装 petsc4py" && conda install -y petsc4py)
 
-# 安装 Trilinos（方法二：源码安装）
+# 安装 Trilinos（源码优先，失败则跳过）
 RUN git clone https://github.com/trilinos/Trilinos.git /trilinos && \
     mkdir -p /trilinos/build && cd /trilinos/build && \
-    cmake .. && make -j$(nproc) || echo "Trilinos 源码安装失败，请手动安装或跳过"
+    cmake .. && make -j$(nproc) \
+    || echo "Trilinos 安装失败，跳过"
 
-# 安装 deal.II（方法二：源码安装）
+# 安装 deal.II（源码优先，失败则跳过）
 RUN git clone https://github.com/dealii/dealii.git /dealii && \
     mkdir -p /dealii/build && cd /dealii/build && \
-    cmake .. && make -j$(nproc) || echo "deal.II 源码安装失败，请手动安装或跳过"
+    cmake .. && make -j$(nproc) \
+    || echo "deal.II 安装失败，跳过"
 
 # 克隆 Lethe CFD
 RUN git clone https://github.com/chaos-polymtl/lethe.git /lethe
@@ -64,8 +69,10 @@ ENV TZ=Asia/Hong_Kong
 RUN apt update && apt install -y tzdata && \
     ln -fs /usr/share/zoneinfo/$TZ /etc/localtime && \
     dpkg-reconfigure -f noninteractive tzdata
+
 # 拷贝可执行文件
 COPY --from=builder /lethe/build/lethe_solver /lethe_solver
+
 # 设置工作目录和默认命令
 WORKDIR /app
 CMD ["/lethe_solver", "/app/config/simulation.prm"]
