@@ -1,8 +1,13 @@
 # 第一阶段：构建 Lethe CFD
 FROM nvidia/cuda:12.6.3-cudnn-devel-ubuntu22.04 AS builder
 
+# 设置非交互模式和时区为香港
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Hong_Kong
+
 # 安装基础依赖
 RUN apt update && apt install -y \
+    tzdata \
     build-essential cmake git wget curl \
     libopenmpi-dev openmpi-bin \
     libboost-all-dev \
@@ -16,11 +21,13 @@ RUN apt update && apt install -y \
     vim nano unzip \
     python3 python3-pip
 
+# 设置时区（避免 tzdata 交互）
+RUN ln -fs /usr/share/zoneinfo/$TZ /etc/localtime && \
+    dpkg-reconfigure -f noninteractive tzdata
 # 安装 Miniconda（用于方法三）
 RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh && \
     bash miniconda.sh -b -p /opt/conda && \
-    rm miniconda.sh && \
-    /opt/conda/bin/conda init bash
+    rm miniconda.sh
 
 ENV PATH=/opt/conda/bin:$PATH
 # 安装 PETSc（方法二：源码安装）
@@ -50,9 +57,15 @@ RUN mkdir -p build && cd build && \
 
 # 第二阶段：精简镜像，仅保留可执行文件
 FROM nvidia/cuda:12.6.3-cudnn-devel-ubuntu22.04
+
+# 设置非交互模式和时区
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Hong_Kong
+RUN apt update && apt install -y tzdata && \
+    ln -fs /usr/share/zoneinfo/$TZ /etc/localtime && \
+    dpkg-reconfigure -f noninteractive tzdata
 # 拷贝可执行文件
 COPY --from=builder /lethe/build/lethe_solver /lethe_solver
-
 # 设置工作目录和默认命令
 WORKDIR /app
 CMD ["/lethe_solver", "/app/config/simulation.prm"]
